@@ -9,6 +9,7 @@ use App\Http\Resources\WarehousePaginateResource;
 use App\Http\Resources\WarehouseResource;
 use App\Models\Warehouse;
 use App\Services\WarehouseService;
+use Illuminate\Http\Request;
 
 class WarehouseController extends Controller
 {
@@ -19,9 +20,20 @@ class WarehouseController extends Controller
     public function __construct(public WarehouseService $warehouseService)
     {}
 
-    public function inventory($id)
+    /**
+     * Get inventory for a specific warehouse.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Resources\Json\WarehousePaginateResource
+     */
+    public function inventory(Request $request, int $warehouseId)
     {
-        $data = $this->warehouseService->getInventory($id);
+        $data = $this->warehouseService->getInventory(
+            $request->get('page', PaginationEnum::PAGE),
+            $request->get('limit', PaginationEnum::LIMIT),
+            $warehouseId
+        );
+        
         return WarehousePaginateResource::collection($data);
     }
 

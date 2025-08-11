@@ -12,9 +12,7 @@ Route::post('logout', [AuthController::class, 'logout']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::group(['prefix' => 'warehouses'], function () {
-
-        Route::get('inventory', [InventoryItemController::class, 'index']); // inventory items listing with filters options First API Required
-
+        Route::get('inventory', [InventoryItemController::class, 'index']);
         Route::post('/stock-transfers', [StockTransferController::class, 'stockTransfer']);
         Route::get('/{id}/inventory', [WarehouseController::class, 'inventory']);
         Route::put('/stock', [StockController::class, 'updateStock']);

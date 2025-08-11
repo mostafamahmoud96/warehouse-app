@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\ENUMS\StockTransactionTypeEnum;
 use App\Events\LowStockDetected;
+use App\Exceptions\CantDecreaseStockBelowZero;
 use App\Exceptions\StockEmpty;
 use App\Models\Stock;
 use App\Repositories\StockRepository;
@@ -74,11 +75,7 @@ class StockService
                 'quantity' => $newQuantity,
             ]);
 
-            if ($stock->pivot->quantity <= 0) {
-                return;
-            }
-
-            if (($newQuantity) < 2 && ! $fromStock->pivot->is_alerted) {
+            if (($newQuantity) < config('stock.low_stock_threshold') && ! $fromStock->pivot->is_alerted) {
                 $alertedQuantities->push($fromStock);
             }
         }
@@ -117,7 +114,10 @@ class StockService
                     $newQuantity = $currentQuantity + $item['quantity'];
 
                 } elseif ($item['transactionType'] == StockTransactionTypeEnum::DECREASE) {
-                    $newQuantity = max(0, $currentQuantity - $item['quantity']);
+                    $newQuantity = $currentQuantity - $item['quantity'];
+                    if ($newQuantity < 0) {
+                        throw new CantDecreaseStockBelowZero();
+                    }
                 }
 
                 $itemLocked->stocks()->updateExistingPivot($warehouseId, [

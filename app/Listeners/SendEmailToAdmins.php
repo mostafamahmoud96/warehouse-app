@@ -2,8 +2,12 @@
 namespace App\Listeners;
 
 use App\Events\LowStockDetected;
+use App\Mail\QuantityAlertMail;
+use App\Services\AdminService;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Mail;
 
-class SendEmailToAdmins
+class SendEmailToAdmins implements ShouldQueue
 {
     /**
      * Create the event listener.
@@ -18,8 +22,7 @@ class SendEmailToAdmins
      */
     public function handle(LowStockDetected $event): void
     {
-        $adminids = [1, 2, 3]; // Example admin IDs, replace with actual logic to fetch admin users
-        // Mail::to('admin@example.com')->send(new LowStockAlertMail($event->alertedQuantities));
-
+        $adminids = app(AdminService::class)->getAdminIds();
+        Mail::to($adminIds)->send(new QuantityAlertMail($event->alertedQuantities));
     }
 }

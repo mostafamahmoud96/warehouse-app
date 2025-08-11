@@ -9,9 +9,9 @@ class StockTransferPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function update(User $user): bool
     {
-        return $user->isAuthenticated() && $user->hasPermissionTo('create-transfer');
-}
+        return $user->isAuthenticated();
+    }
 
 }

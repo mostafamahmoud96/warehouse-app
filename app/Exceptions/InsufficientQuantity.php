@@ -17,7 +17,6 @@ class InsufficientQuantity extends Exception
                 return "Stock {$stock['item']} requires more Quantity which is " . abs($stock['diff']) . " GM for {$stock['quantity']}";
             });
         })->all();
-
         return response()->json([
             'success' => false,
             'message' => 'Insufficient quantity in stock',

@@ -10,6 +10,14 @@ class InventoryItemService
     {
     }
 
+    /**
+     * Get paginated inventory items with optional filters.
+     *
+     * @param int $page
+     * @param int $perPage
+     * @param Filter $filter
+     * @return mixed
+     */
     public function index(int $page, int $perPage, Filter $filter)
     {
         return $this->inventoryItemRepository->index($page, $perPage, $filter);

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\AdminSeeder;
 use Database\Seeders\WarehouseSeeder;
 use Database\Seeders\InventoryItemSeeder;
 
@@ -15,14 +16,16 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            'name'  => 'Test User',
-            'email' => 'test@example.com',
+            'name'     => 'Test User',
+            'email'    => 'test@example.com',
+            'password' => bcrypt('password'),
         ]);
 
         $this->call([
             WarehouseSeeder::class,
             InventoryItemSeeder::class,
             StockTransferSeeder::class,
+            AdminSeeder::class,
         ]);
     }
 }

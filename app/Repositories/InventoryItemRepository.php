@@ -12,6 +12,14 @@ class InventoryItemRepository
     public function __construct(public InventoryItem $model)
     {}
 
+    /**
+     * Get paginated inventory items with optional filters.
+     *
+     * @param int $page
+     * @param int $perPage
+     * @param Filter $filter
+     * @return mixed
+     */
     public function index(int $page, int $perPage, $filter)
     {
         $columns = [
@@ -19,13 +27,11 @@ class InventoryItemRepository
             'inventory_items.name',
             'inventory_items.created_at',
             'inventory_items.price',
-
         ];
 
         $items = InventoryItem::query()
-            ->with(['stocks']) // assuming stock belongsTo warehouse
+            ->with(['stocks'])
             ->filter($filter)
-            ->orderBy('inventory_items.created_at', 'desc')
             ->paginate($perPage, $columns, 'page', $page);
 
         return $items;

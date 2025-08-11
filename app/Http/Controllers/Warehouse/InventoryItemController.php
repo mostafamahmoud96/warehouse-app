@@ -17,6 +17,13 @@ class InventoryItemController extends Controller
     public function __construct(public InventoryItemService $inventoryItemService)
     {}
 
+    /**
+     * paginated list of inventory per warehouse
+     *
+     * @param Request $request
+     * @param InventoryItemFilter $filter
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
     public function index(Request $request, InventoryItemFilter $filter)
     {
         $data = $this->inventoryItemService->index(

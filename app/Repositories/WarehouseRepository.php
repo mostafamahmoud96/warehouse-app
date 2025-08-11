@@ -39,15 +39,19 @@ class WarehouseRepository
 
     }
 
-    public function getInventory(int $id)
+    /**
+     * Get inventory for a specific warehouse.
+     *
+     * @param int $page
+     * @param int $perPage
+     * @param int $warehouseId
+     * @return \Illuminate\Support\Collection
+     */
+    public function getInventory(int $page, int $perPage, int $warehouseId)
     {
-        $perPage = 10; // Default items per page
-        $page = 1; // Default page number
-        return Cache::remember("warehouse_inventory_{$id}_page_{$page}_perPage_{$perPage}", 3600, function () use ($id, $page, $perPage) {
-            $warehouse = Warehouse::findOrFail($id);
-
-            // Paginate the stocks relationship
-            $stocks = $warehouse->with('stocks')->paginate($perPage, ['*'], 'page', $page);
+        return Cache::remember("warehouse_inventory_{$warehouseId}_page_{$page}_perPage_{$perPage}", 3600, function () use ($warehouseId, $page, $perPage) {
+            $warehouse = Warehouse::findOrFail($warehouseId);
+            $stocks    = $warehouse->with('stocks')->paginate($perPage, ['*'], 'page', $page);
             return $stocks;
         });
 

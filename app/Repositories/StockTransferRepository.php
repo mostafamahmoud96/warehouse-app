@@ -31,6 +31,7 @@ class StockTransferRepository
                 ],
                 [
                     'quantity' => $quantity['quantity'],
+                    'transfer_date' => now(),
                 ]
             );
             $transfers[] = $transfer->toArray();

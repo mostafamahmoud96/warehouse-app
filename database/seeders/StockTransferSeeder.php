@@ -25,7 +25,6 @@ class StockTransferSeeder extends Seeder
                         ->value('quantity');
 
                     if ($currentStock >= $quantity) {
-                        // Create stock transfer
                         $fromWarehouse->outgoingStockTransfers()->create([
                             'to_warehouse_id'   => $toWarehouse->id,
                             'inventory_item_id' => $inventoryItem->id,
@@ -33,7 +32,6 @@ class StockTransferSeeder extends Seeder
                             'transfer_date'     => now(),
                         ]);
 
-                        // Update stock quantities
                         $toWarehouse->stocks()
                             ->where('inventory_item_id', $inventoryItem->id)
                             ->increment('quantity', $quantity);

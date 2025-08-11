@@ -1,7 +1,6 @@
 <?php
 namespace App\Mail;
 
-use App\Models\Stock;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -17,10 +16,6 @@ class QuantityAlertMail extends Mailable
      */
     public function __construct()
     {
-        $this->alertedQuantities->each(function (Stock $stock) {
-            $stock->alerted()->create();
-        });
-
     }
 
     /**
@@ -40,7 +35,7 @@ class QuantityAlertMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.ingredient-alert',
+            markdown: 'emails.quantity-alert',
             with: ['alertedQuantities' => $this->alertedQuantities],
         );
     }

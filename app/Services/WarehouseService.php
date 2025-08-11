@@ -29,8 +29,8 @@ class WarehouseService
      * @param int $id
      * @return \Illuminate\Support\Collection
      */
-    public function getInventory(int $id)
+    public function getInventory(int $page, int $perPage, int $warehouseId)
     {
-        return $this->warehouseRepository->getInventory($id);
+        return $this->warehouseRepository->getInventory($page, $perPage, $warehouseId);
     }
 }

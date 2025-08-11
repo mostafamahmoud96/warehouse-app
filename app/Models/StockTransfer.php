@@ -13,6 +13,7 @@ class StockTransfer extends Model
         'to_warehouse_id',
         'inventory_item_id',
         'quantity',
+        'transfer_date',
     ];
 
     public function fromWarehouse()

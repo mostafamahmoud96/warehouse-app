@@ -12,10 +12,8 @@ class InventoryItemSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create 20 inventory items
         InventoryItem::factory(20)->create();
 
-        // Assign random stock quantities to each warehouse for each inventory item
         Warehouse::all()->each(function ($warehouse) {
             $inventoryItems = InventoryItem::all();
 
@@ -32,4 +30,5 @@ class InventoryItemSeeder extends Seeder
             $warehouse->stocks()->sync($stocks);
         });
     }
+
 }

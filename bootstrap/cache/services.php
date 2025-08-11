@@ -33,10 +33,11 @@
     29 => 'Carbon\\Laravel\\ServiceProvider',
     30 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     31 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    32 => 'Spatie\\LaravelData\\LaravelDataServiceProvider',
-    33 => 'Spatie\\StructureDiscoverer\\StructureDiscovererServiceProvider',
-    34 => 'App\\Providers\\AppServiceProvider',
-    35 => 'App\\Providers\\TelescopeServiceProvider',
+    32 => 'Pest\\Laravel\\PestServiceProvider',
+    33 => 'Spatie\\LaravelData\\LaravelDataServiceProvider',
+    34 => 'Spatie\\StructureDiscoverer\\StructureDiscovererServiceProvider',
+    35 => 'App\\Providers\\AppServiceProvider',
+    36 => 'App\\Providers\\TelescopeServiceProvider',
   ),
   'eager' => 
   array (
@@ -57,10 +58,11 @@
     14 => 'Carbon\\Laravel\\ServiceProvider',
     15 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     16 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    17 => 'Spatie\\LaravelData\\LaravelDataServiceProvider',
-    18 => 'Spatie\\StructureDiscoverer\\StructureDiscovererServiceProvider',
-    19 => 'App\\Providers\\AppServiceProvider',
-    20 => 'App\\Providers\\TelescopeServiceProvider',
+    17 => 'Pest\\Laravel\\PestServiceProvider',
+    18 => 'Spatie\\LaravelData\\LaravelDataServiceProvider',
+    19 => 'Spatie\\StructureDiscoverer\\StructureDiscovererServiceProvider',
+    20 => 'App\\Providers\\AppServiceProvider',
+    21 => 'App\\Providers\\TelescopeServiceProvider',
   ),
   'deferred' => 
   array (
