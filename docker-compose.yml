@@ -1,0 +1,60 @@
+version: "3.7"
+
+services:
+  app:
+    build:
+      args:
+        UID: '${UID:-1000}'
+        UGROUP: '${UGROUP:-1000}'
+      context: ./
+      dockerfile: dev-ops/Dockerfile
+    image: warehouse_app
+    container_name: warehouse_app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+
+  db:
+    image: mysql:5.7
+    container_name: warehouse_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: warehouse
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - warehouse_db:/var/lib/mysql
+
+  nginx:
+    image: nginx:alpine
+    container_name: warehouse_nginx
+    restart: unless-stopped
+    ports:
+      - "84:80"
+    volumes:
+      - ./:/var/www
+      - ./dev-ops/nginx:/etc/nginx/conf.d
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8082:80"
+    container_name: warehouse_phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql
+    restart: unless-stopped
+    depends_on:
+      - db
+
+  redis:
+    image: redis:alpine
+    container_name: warehouse_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+
+
+volumes:
+  warehouse_db:
