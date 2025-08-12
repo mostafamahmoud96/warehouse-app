@@ -1,12 +1,13 @@
 <?php
 namespace App\Http\Controllers\Warehouse;
 
+use App\Models\Warehouse;
+use App\Util\PaginationUtil;
+use App\Services\WarehouseService;
 use App\Http\Controllers\Controller;
 use App\Http\Dto\ListItemsRequestData;
+use App\Http\Filters\InventoryItemFilter;
 use App\Http\Resources\WarehousePaginateResource;
-use App\Models\Warehouse;
-use App\Services\WarehouseService;
-use App\Util\PaginationUtil;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class WarehouseController extends Controller
@@ -24,14 +25,15 @@ class WarehouseController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Resources\Json\WarehousePaginateResource
      */
-    public function inventory(ListItemsRequestData $data, int $warehouseId)
+    public function inventory(ListItemsRequestData $data, int $warehouseId, InventoryItemFilter $filter)
     {
         $this->authorize('list', Warehouse::class);
 
         $data = $this->warehouseService->getInventory(
             $data->page ?? PaginationUtil::PAGE,
             $data->limit ?? PaginationUtil::LIMIT,
-            $warehouseId
+            $warehouseId,
+            $filter
         );
 
         return WarehousePaginateResource::collection($data);

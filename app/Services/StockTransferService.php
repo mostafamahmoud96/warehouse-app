@@ -41,12 +41,17 @@ class StockTransferService
                 );
 
             }
-
             return $transfers;
         });
 
     }
 
+    /**
+     * Transfer items to a specific warehouse.
+     *
+     * @param array $data
+     * @return \Illuminate\Support\Collection
+     */
     public function transferItemsToWarehouse(array $data)
     {
         return $this->stockTransferRepository->transferItemsToWarehouse($data);

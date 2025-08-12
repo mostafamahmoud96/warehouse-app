@@ -2,6 +2,7 @@
 namespace App\Repositories;
 
 use App\Models\Warehouse;
+use App\Http\Filters\Filter;
 use Illuminate\Support\Facades\Cache;
 
 class WarehouseRepository
@@ -21,11 +22,13 @@ class WarehouseRepository
      * @param int $warehouseId
      * @return \Illuminate\Support\Collection
      */
-    public function getInventory(int $page, int $perPage, int $warehouseId)
+    public function getInventory(int $page, int $perPage, int $warehouseId, Filter $filter)
     {
-        return Cache::remember("warehouse_inventory_{$warehouseId}_page_{$page}_perPage_{$perPage}", 3600, function () use ($warehouseId, $page, $perPage) {
+        return Cache::remember("warehouse_inventory_{$warehouseId}_page_{$page}_perPage_{$perPage}", 3600, function () use ($warehouseId, $page, $perPage, $filter) {
             $warehouse = Warehouse::findOrFail($warehouseId);
-            $stocks    = $warehouse->with('stocks')->paginate($perPage, ['*'], 'page', $page);
+            $stocks    = $warehouse->with('stocks')
+                ->filter($filter)
+                ->paginate($perPage, ['*'], 'page', $page);
             return $stocks;
         });
 

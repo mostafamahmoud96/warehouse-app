@@ -276,10 +276,11 @@ it('retrieves paginated inventory for a specific warehouse', function () {
 
     $repository = new WarehouseRepository(new Warehouse());
 
+    $filter  = new InventoryItemFilter(new Request());
     $page    = 1;
     $perPage = 10;
 
-    $result = $repository->getInventory($page, $perPage, $warehouse->id);
+    $result = $repository->getInventory($page, $perPage, $warehouse->id, $filter);
 
     expect($result)->toBeInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class);
     expect($result->perPage())->toBe($perPage);
@@ -302,18 +303,21 @@ it('caches the inventory result for subsequent calls', function () {
             return $callback();
         });
 
-    $result = $repository->getInventory($page, $perPage, $warehouse->id);
+    $filter = new InventoryItemFilter(new Request());
+    $result = $repository->getInventory($page, $perPage, $warehouse->id, $filter);
 
     expect($result)->toBeInstanceOf(LengthAwarePaginator::class);
 });
 
-it('filters inventory items based on provided filters', function () {
+it('filters warehouses based on provided filters', function () {
 
-    $warehouse = Warehouse::factory()->create();
+    $warehouse = Warehouse::factory()->create([
+        'name' => "Lebsack-Langosh Warehouse",
+    ]);
 
-    $item1 = InventoryItem::factory()->create(['name' => 'Item A']);
-    $item2 = InventoryItem::factory()->create(['name' => 'second B']);
-    $item3 = InventoryItem::factory()->create(['name' => 'third C']);
+    $item1 = InventoryItem::factory()->create();
+    $item2 = InventoryItem::factory()->create();
+    $item3 = InventoryItem::factory()->create();
 
     $warehouse->stocks()->attach($item1->id, ['quantity' => 10]);
     $warehouse->stocks()->attach($item2->id, ['quantity' => 5]);
@@ -321,14 +325,34 @@ it('filters inventory items based on provided filters', function () {
 
     $repository = new WarehouseRepository(new Warehouse());
 
-    $filters = [
-        'name' => 'Item',
-    ];
+    $filter = new InventoryItemFilter(new Request(['name' => 'Leb']));
 
-    $result = $repository->getInventory(1, 10, $warehouse->id, $filters);
+    $result = $repository->getInventory(1, 10, $warehouse->id, $filter);
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class);
     expect($result->total())->toBe(1);
+});
+
+it('filters iventory items based on provided filters', function () {
+
+    $warehouse = Warehouse::factory()->create();
+
+    $item1 = InventoryItem::factory()->create(['name' => 'Item A']);
+    $item2 = InventoryItem::factory()->create(['name' => 'Item B']);
+    $item3 = InventoryItem::factory()->create(['name' => 'third C']);
+
+    $warehouse->stocks()->attach($item1->id, ['quantity' => 10]);
+    $warehouse->stocks()->attach($item2->id, ['quantity' => 5]);
+    $warehouse->stocks()->attach($item3->id, ['quantity' => 20]);
+
+    $repository = new InventoryItemRepository(new InventoryItem());
+
+    $filter = new InventoryItemFilter(new Request(['name' => 'Item']));
+
+    $result = $repository->index(1, 10, $filter);
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class);
+
+    expect($result->total())->toBe(2);
 });
 
 it('paginated list of inventory per warehouse', function () {
