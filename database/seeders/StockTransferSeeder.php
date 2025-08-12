@@ -4,6 +4,7 @@ namespace Database\Seeders;
 use App\Models\InventoryItem;
 use App\Models\Warehouse;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class StockTransferSeeder extends Seeder
 {
@@ -33,12 +34,15 @@ class StockTransferSeeder extends Seeder
                         ]);
 
                         $toWarehouse->stocks()
-                            ->where('inventory_item_id', $inventoryItem->id)
-                            ->increment('quantity', $quantity);
+                            ->updateExistingPivot($inventoryItem->id, [
+                                'quantity' => DB::raw('quantity + ' . $quantity),
+                            ]);
 
                         $fromWarehouse->stocks()
-                            ->where('inventory_item_id', $inventoryItem->id)
-                            ->decrement('quantity', $quantity);
+                            ->updateExistingPivot($inventoryItem->id, [
+                                'quantity' => DB::raw('quantity - ' . $quantity),
+                            ]);
+
                     }
                 }
             }
