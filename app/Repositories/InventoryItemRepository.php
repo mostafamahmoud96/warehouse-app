@@ -66,7 +66,7 @@ class InventoryItemRepository
         return InventoryItem::query()->with(['stocks' => function ($query) use ($fromWarehouseId, $toWarehouseId) {
             $query->whereIn('warehouse_id', [$fromWarehouseId, $toWarehouseId])
                 ->lockForUpdate();
-        }])->find($id);
+        }])->lockForUpdate()->find($id);
     }
 
 }
