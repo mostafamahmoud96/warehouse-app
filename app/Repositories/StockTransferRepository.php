@@ -1,8 +1,8 @@
 <?php
 namespace App\Repositories;
 
-use Carbon\Carbon;
 use App\Models\StockTransfer;
+use Carbon\Carbon;
 
 class StockTransferRepository
 {
@@ -24,15 +24,13 @@ class StockTransferRepository
 
         $transfers = [];
         foreach ($dataToSync as $inventoryItemId => $quantity) {
-            $transfer = $this->model->updateOrCreate(
+            $transfer = $this->model->create(
                 [
                     'from_warehouse_id' => $data['fromWarehouseId'],
                     'to_warehouse_id'   => $data['toWarehouseId'],
                     'inventory_item_id' => $inventoryItemId,
-                ],
-                [
-                    'quantity'      => $quantity['quantity'],
-                    'transfer_date' => Carbon::now()->toDateTimeString(),
+                    'quantity'          => $quantity['quantity'],
+                    'transfer_date'     => Carbon::now()->toDateTimeString(),
                 ]
             );
             $transfers[] = $transfer->toArray();
