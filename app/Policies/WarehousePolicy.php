@@ -16,6 +16,8 @@ class WarehousePolicy
         if (! $authorize) {
             throw new UnauthorizedActionException("You are not authorized to list warehouses.");
         }
+
+        return true;
     }
 
 }
