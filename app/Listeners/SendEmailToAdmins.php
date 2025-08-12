@@ -22,7 +22,11 @@ class SendEmailToAdmins implements ShouldQueue
      */
     public function handle(LowStockDetected $event): void
     {
-        $adminids = app(AdminService::class)->getAdminIds();
+        $adminIds = app(AdminService::class)->getAdminIds();
+        if (! count($adminIds)) {
+            return;
+        }
+
         Mail::to($adminIds)->send(new QuantityAlertMail($event->alertedQuantities));
     }
 }

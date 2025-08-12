@@ -1,12 +1,13 @@
 <?php
 namespace App\Services;
 
-use App\Models\Stock;
-use App\Exceptions\StockEmpty;
 use App\Events\LowStockDetected;
+use App\Exceptions\CantDecreaseStockBelowZero;
+use App\Exceptions\StockEmpty;
+use App\Models\Stock;
 use App\Repositories\StockRepository;
 use App\Util\StockTransactionTypeUtil;
-use App\Exceptions\CantDecreaseStockBelowZero;
+use Illuminate\Support\Facades\DB;
 
 class StockService
 {
@@ -99,46 +100,74 @@ class StockService
 
     }
 
+    /**
+     *   I made this method to handle both adding new stock and updating existing stock directly in the warehouse.
+     * Add or edit stock for items in a warehouse.
+     * @param array $data
+     * @return \Illuminate\Support\Collection
+     * @throws CantDecreaseStockBelowZero
+     *
+     */
     public function AddEditStock(array $data)
     {
-        $warehouseId = $data['warehouseId'];
+        return DB::transaction(function () use ($data) {
+            $warehouseId       = $data['warehouseId'];
+            $alertedQuantities = collect();
 
-        foreach ($data['items'] as $item) {
-            $itemLocked = $this->inventoryItemService->getItemByIdWithLock($item['inventoryItemId'], $warehouseId);
-            $stock      = $itemLocked->stocks()->where('warehouse_id', $warehouseId)->first();
+            foreach ($data['items'] as $item) {
+                $itemLocked = $this->inventoryItemService->getItemByIdWithLock($item['inventoryItemId'], $warehouseId);
+                $stock      = $itemLocked->stocks()->where('warehouse_id', $warehouseId)->first();
 
-            if ($stock) {
-                $newQuantity     = $stock->pivot->quantity + $item['quantity'];
-                $currentQuantity = $stock->pivot->quantity ?? 0;
-                if ($item['transactionType'] == StockTransactionTypUtil::INCREASE) {
-                    $newQuantity = $currentQuantity + $item['quantity'];
+                if ($stock) {
+                    $newQuantity     = $stock->pivot->quantity + $item['quantity'];
+                    $currentQuantity = $stock->pivot->quantity ?? 0;
+                    if ($item['transactionType'] == StockTransactionTypeUtil::INCREASE) {
+                        $newQuantity = $currentQuantity + $item['quantity'];
 
-                } elseif ($item['transactionType'] == StockTransactionTypeUtil::DECREASE) {
-                    $newQuantity = $currentQuantity - $item['quantity'];
-                    if ($newQuantity < 0) {
-                        throw new CantDecreaseStockBelowZero();
+                    } elseif ($item['transactionType'] == StockTransactionTypeUtil::DECREASE) {
+                        $newQuantity = $currentQuantity - $item['quantity'];
+                        if ($newQuantity < 0) {
+                            throw new CantDecreaseStockBelowZero();
+                        }
                     }
+
+                    $itemLocked->stocks()->updateExistingPivot($warehouseId, [
+                        'quantity'   => $newQuantity,
+                        'updated_at' => now(),
+                    ]);
+
+                    if ($newQuantity < config('stock.low_stock_threshold') && ! $stock->pivot->is_alerted) {
+                        $alertedQuantities->push($stock);
+                    }
+
+                } else {
+                    $quantity = $item['quantity'];
+                    if ($item['transactionType'] == StockTransactionTypeUtil::DECREASE) {
+                        $quantity = max(0, $quantity);
+                    }
+
+                    $itemLocked->stocks()->attach($warehouseId, [
+                        'quantity'   => $quantity,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                    $stock = $itemLocked->stocks()->where('warehouse_id', $warehouseId)->first();
+
+                    if ($newQuantity < config('stock.low_stock_threshold') && ! $stock->pivot->is_alerted) {
+                        $alertedQuantities->push($stock);
+                    }
+
                 }
 
-                $itemLocked->stocks()->updateExistingPivot($warehouseId, [
-                    'quantity'   => $newQuantity,
-                    'updated_at' => now(),
-                ]);
-            } else {
-                $quantity = $item['quantity'];
-                if ($item['transactionType'] == StockTransactionTypeUtil::DECREASE) {
-                    $quantity = max(0, $quantity);
-                }
-
-                $itemLocked->stocks()->attach($warehouseId, [
-                    'quantity'   => $quantity,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
             }
 
-        }
+            if ($alertedQuantities->isNotEmpty()) {
+                event(new LowStockDetected($alertedQuantities));
+            }
 
-        return $itemLocked->stocks()->where('warehouse_id', $warehouseId)->get();
+            return $itemLocked->stocks()->where('warehouse_id', $warehouseId)->get();
+        }
+        );
     }
 }

@@ -17,21 +17,26 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         $roles = RolesUtil::getLocalConstants();
 
+        $rolesData = [];
         foreach ($roles as $role) {
-            Role::firstOrCreate([
+            $rolesData[] = [
                 'name'       => $role,
                 'guard_name' => 'api',
-            ]);
+            ];
         }
 
-        $permissions = PermissionsUtil::getLocalConstants();
+        Role::insert($rolesData);
+
+        $permissions     = PermissionsUtil::getLocalConstants();
+        $permissionsData = [];
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate([
+            $permissionsData[] = [
                 'name'       => $permission,
                 'guard_name' => 'api',
-            ]);
-
+            ];
         }
+
+        Permission::insert($permissionsData);
 
         $adminRole   = Role::findByName(RolesUtil::ADMIN, 'api');
         $managerRole = Role::findByName(RolesUtil::MANAGER, 'api');

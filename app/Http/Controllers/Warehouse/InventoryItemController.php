@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Warehouse;
 
 use App\Http\Controllers\Controller;
+use App\Http\Dto\ListItemsRequestData;
 use App\Http\Filters\InventoryItemFilter;
 use App\Http\Resources\InventoryItemResource;
 use App\Models\InventoryItem;
@@ -24,11 +25,11 @@ class InventoryItemController extends Controller
      * @param InventoryItemFilter $filter
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index(Request $request, InventoryItemFilter $filter)
+    public function index(ListItemsRequestData $data, InventoryItemFilter $filter)
     {
         $data = $this->inventoryItemService->index(
-            $request->get('page', PaginationUtil::PAGE),
-            $request->get('limit', PaginationUtil::LIMIT),
+            $data->page ?? PaginationUtil::PAGE,
+            $data->limit ?? PaginationUtil::LIMIT,
             $filter
         );
 

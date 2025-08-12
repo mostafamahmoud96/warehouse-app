@@ -10,4 +10,11 @@ class CantDecreaseStockBelowZero extends Exception
     {
         parent::__construct('Cannot decrease stock below zero', Response::HTTP_BAD_REQUEST);
     }
+
+    public function render($request)
+    {
+        return response()->json([
+            'message' => $this->getMessage(),
+        ], Response::HTTP_BAD_REQUEST);
+    }
 }

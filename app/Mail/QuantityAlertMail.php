@@ -6,6 +6,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 
 class QuantityAlertMail extends Mailable
 {
@@ -14,7 +15,7 @@ class QuantityAlertMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(public Collection $alertedQuantities)
     {
     }
 
@@ -26,6 +27,7 @@ class QuantityAlertMail extends Mailable
         return new Envelope(
             subject: 'Quantity Alert Mail',
             from: "izam@support.com",
+
         );
     }
 

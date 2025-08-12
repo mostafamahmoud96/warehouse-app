@@ -37,6 +37,12 @@ class InventoryItemRepository
         return $items;
     }
 
+    /**
+     * Get inventory items with a lock for stock transfer.
+     *
+     * @param array $data
+     * @return \Illuminate\Support\Collection
+     */
     public function getItemsWithLock(array $data)
     {
         $items = InventoryItem::query()->with(['stocks' => function ($query) {

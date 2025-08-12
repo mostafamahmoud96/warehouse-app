@@ -14,7 +14,7 @@ class InsufficientQuantity extends Exception
     {
         $errors = $this->inSufficientItems->map(function ($item) {
             return $item->map(function ($stock) {
-                return "Stock {$stock['item']} requires more Quantity which is " . abs($stock['diff']) . " GM for {$stock['quantity']}";
+                return "Stock with name {$stock['item']} requires more Quantity which is " . abs($stock['diff']) . " for the required quantity {$stock['quantity']}";
             });
         })->all();
         return response()->json([

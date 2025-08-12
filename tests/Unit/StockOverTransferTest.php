@@ -5,16 +5,19 @@ use App\Exceptions\CantDecreaseStockBelowZero;
 use App\Exceptions\InsufficientQuantity;
 use App\Exceptions\UnauthorizedActionException;
 use App\Http\Controllers\Warehouse\StockTransferController;
+use App\Http\Filters\InventoryItemFilter;
 use App\Http\Requests\CreateStockTransfeRequest;
 use App\Models\InventoryItem;
 use App\Models\Stock;
 use App\Models\User;
 use App\Models\Warehouse;
+use App\Repositories\InventoryItemRepository;
 use App\Repositories\WarehouseRepository;
 use App\Services\StockService;
 use App\Services\StockTransferService;
 use App\Util\PermissionsUtil;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
@@ -326,4 +329,49 @@ it('filters inventory items based on provided filters', function () {
 
     expect($result)->toBeInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class);
     expect($result->total())->toBe(1);
+});
+
+it('paginated list of inventory per warehouse', function () {
+    $warehouse = Warehouse::factory()->create();
+    $stocks    = Stock::factory()->count(15)->create(['warehouse_id' => $warehouse->id]);
+
+    $repository = new InventoryItemRepository(new InventoryItem());
+
+    $page    = 1;
+    $perPage = 5;
+
+    $req    = new Request();
+    $filter = new InventoryItemFilter($req);
+    $result = $repository->index($page, $perPage, $filter);
+
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class);
+    expect($result->perPage())->toBe($perPage);
+    expect($result->currentPage())->toBe($page);
+});
+
+it('update is_alerted value when stock is below threshold', function () {
+
+    $fromWarehouse = Warehouse::factory()->create();
+    $toWarehouse   = Warehouse::factory()->create();
+    $inventoryItem = InventoryItem::factory()->create([
+        'name' => 'Test Item',
+    ]);
+
+    $fromWarehouse->stocks()->attach($inventoryItem->id, ['quantity' => 10, 'is_alerted' => false]);
+
+    $stockTransferService = app(StockTransferService::class);
+
+    $stockTransferService->stockTransfer([
+        'fromWarehouseId' => $fromWarehouse->id,
+        'toWarehouseId'   => $toWarehouse->id,
+        'items'           => [
+            [
+                'inventoryItemId' => $inventoryItem->id,
+                'quantity'        => 9,
+            ],
+        ],
+    ]);
+
+    $updatedStock = $fromWarehouse->stocks()->withPivot('is_alerted')->where('inventory_item_id', $inventoryItem->id)->first();
+    expect((bool) $updatedStock->pivot->is_alerted)->toBeTrue();
 });

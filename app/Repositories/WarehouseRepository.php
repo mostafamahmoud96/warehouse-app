@@ -2,7 +2,6 @@
 namespace App\Repositories;
 
 use App\Models\Warehouse;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 
 class WarehouseRepository
@@ -13,31 +12,6 @@ class WarehouseRepository
      */
     public function __construct(public Warehouse $model)
     {}
-
-    /**
-     * Paginate inventory items for a specific warehouse.
-     *
-     * @param int $warehouseId
-     * @return \Illuminate\Pagination\LengthAwarePaginator
-     */
-    public function paginate(int $page, int $perPage, $filter): LengthAwarePaginator
-    {
-        $columns = [
-            '*',
-        ];
-
-        $query = Warehouse::query();
-        return $query->select($columns)
-            ->filter($filter)
-            ->with('inventoryItems')
-            ->paginate(
-                $perPage,
-                $columns,
-                'page',
-                $page
-            );
-
-    }
 
     /**
      * Get inventory for a specific warehouse.

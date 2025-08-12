@@ -4,10 +4,10 @@
     The following Quantities are running low:
 
     <x-mail::table>
-        | Item | Stock | Quantity |
+        | Item | Quantity |
         |:-------------:|:-------------:|:--------:|:-------------:|
-        @foreach ($items as $item)
-            | {{ $item->name }} | {{ $item->stock }} | {{ $item->level }}
+        @foreach ($alertedQuantities as $item)
+            | {{ $item->name }} | {{ $item->pivot->quantity }} |
         @endforeach
     </x-mail::table>
 

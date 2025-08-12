@@ -12,7 +12,7 @@ class InventoryItemSeeder extends Seeder
      */
     public function run(): void
     {
-        InventoryItem::factory(20)->create();
+        InventoryItem::factory(5)->create();
 
         Warehouse::all()->each(function ($warehouse) {
             $inventoryItems = InventoryItem::all();

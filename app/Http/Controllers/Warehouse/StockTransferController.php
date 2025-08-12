@@ -19,8 +19,10 @@ class StockTransferController extends Controller
     public function stockTransfer(CreateStockTransfeRequest $request)
     {
         $this->authorize('update', StockTransfer::class);
-        $transfers = $this->stockTransferService->stockTransfer($request->validated());
+        $this->stockTransferService->stockTransfer($request->validated());
 
-        return response()->json($transfers, 200);
+        return response()->json([
+            'message' => 'Stock transfer updated successfully',
+        ], 200);
     }
 }

@@ -23,11 +23,25 @@ class InventoryItemService
         return $this->inventoryItemRepository->index($page, $perPage, $filter);
     }
 
+    /**
+     * Get inventory items with a lock for stock transfer.
+     *
+     * @param array $productIds
+     * @return \Illuminate\Support\Collection
+     */
     public function getItemsWithLock(array $productIds)
     {
         return $this->inventoryItemRepository->getItemsWithLock($productIds);
     }
 
+    /**
+     * Get an inventory item by ID with a lock.
+     *
+     * @param int $itemId
+     * @param int $fromWarehouseId
+     * @param int|null $toWarehouseId
+     * @return mixed
+     */
     public function getItemByIdWithLock(int $itemId, int $fromWarehouseId, ?int $toWarehouseId = null)
     {
         return $this->inventoryItemRepository->getItemByIdWithLock($itemId, $fromWarehouseId, $toWarehouseId);

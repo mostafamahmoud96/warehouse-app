@@ -23,6 +23,8 @@ class StockController extends Controller
     public function updateStock(UpdateStockRequest $request)
     {
         $data = $this->stockService->AddEditStock($request->validated());
-        return InventoryItemResourceCollection::make($data);
+        return response()->json([
+            'message' => 'Stock updated successfully',
+        ], 200);
     }
 }
