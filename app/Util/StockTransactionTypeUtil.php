@@ -1,7 +1,7 @@
 <?php
-namespace App\ENUMS;
+namespace App\Util;
 
-class StockTransactionTypeEnum
+class StockTransactionTypeUtil
 {
     const INCREASE = 'increase';
     const DECREASE = 'decrease';

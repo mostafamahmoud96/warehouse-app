@@ -19,7 +19,6 @@ class InventoryItemResource extends JsonResource
             'name'       => $this->name,
             'created_at' => $this->created_at->toDateTimeString(),
             'price'      => $this->price,
-            
             'warehouses' => WarehouseResource::collection($this->whenLoaded('stocks')),
         ];
     }

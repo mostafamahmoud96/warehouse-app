@@ -1,12 +1,12 @@
 <?php
 namespace App\Services;
 
-use App\ENUMS\StockTransactionTypeEnum;
-use App\Events\LowStockDetected;
-use App\Exceptions\CantDecreaseStockBelowZero;
-use App\Exceptions\StockEmpty;
 use App\Models\Stock;
+use App\Exceptions\StockEmpty;
+use App\Events\LowStockDetected;
 use App\Repositories\StockRepository;
+use App\Util\StockTransactionTypeUtil;
+use App\Exceptions\CantDecreaseStockBelowZero;
 
 class StockService
 {
@@ -110,10 +110,10 @@ class StockService
             if ($stock) {
                 $newQuantity     = $stock->pivot->quantity + $item['quantity'];
                 $currentQuantity = $stock->pivot->quantity ?? 0;
-                if ($item['transactionType'] == StockTransactionTypeEnum::INCREASE) {
+                if ($item['transactionType'] == StockTransactionTypUtil::INCREASE) {
                     $newQuantity = $currentQuantity + $item['quantity'];
 
-                } elseif ($item['transactionType'] == StockTransactionTypeEnum::DECREASE) {
+                } elseif ($item['transactionType'] == StockTransactionTypeUtil::DECREASE) {
                     $newQuantity = $currentQuantity - $item['quantity'];
                     if ($newQuantity < 0) {
                         throw new CantDecreaseStockBelowZero();
@@ -126,7 +126,7 @@ class StockService
                 ]);
             } else {
                 $quantity = $item['quantity'];
-                if ($item['transactionType'] == StockTransactionTypeEnum::DECREASE) {
+                if ($item['transactionType'] == StockTransactionTypeUtil::DECREASE) {
                     $quantity = max(0, $quantity);
                 }
 

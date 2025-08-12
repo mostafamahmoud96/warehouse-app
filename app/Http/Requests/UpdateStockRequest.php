@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Requests;
 
-use App\ENUMS\StockTransactionTypeEnum;
+use App\Util\StockTransactionTypeUtil;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateStockRequest extends FormRequest
@@ -26,7 +26,7 @@ class UpdateStockRequest extends FormRequest
             'items'                   => 'required|array',
             'items.*.inventoryItemId' => 'required|exists:inventory_items,id',
             'items.*.quantity'        => 'required|integer|min:1',
-            'items.*.transactionType' => 'required|in:' . implode(',', StockTransactionTypeEnum::getValues()),
+            'items.*.transactionType' => 'required|in:' . implode(',', StockTransactionTypeUtil::getValues()),
         ];
     }
 }

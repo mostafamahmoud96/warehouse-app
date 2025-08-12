@@ -1,7 +1,7 @@
 <?php
-namespace App\ENUMS;
+namespace App\Util;
 
-class PaginationEnum
+class PaginationUtil
 {
     const PAGE  = 1;
     const LIMIT = 10;

@@ -1,7 +1,9 @@
 <?php
 namespace App\Policies;
 
+use App\Exceptions\UnauthorizedActionException;
 use App\Models\User;
+use App\Util\PermissionsUtil;
 
 class StockTransferPolicy
 {
@@ -11,7 +13,13 @@ class StockTransferPolicy
      */
     public function update(User $user): bool
     {
-        return $user->isAuthenticated();
+        $authorize = $user->hasPermissionTo(PermissionsUtil::UPDATE_STOCK_TRANSFER, 'api');
+        if (! $authorize) {
+            throw new UnauthorizedActionException("You are not authorized to update stock transfers.");
+        }
+
+        return true;
+
     }
 
 }

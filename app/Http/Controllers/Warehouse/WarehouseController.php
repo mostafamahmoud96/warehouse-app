@@ -1,19 +1,20 @@
 <?php
 namespace App\Http\Controllers\Warehouse;
 
-use App\ENUMS\PaginationEnum;
+use App\Models\Warehouse;
+use App\Util\PaginationUtil;
+use Illuminate\Http\Request;
+use App\Services\WarehouseService;
 use App\Http\Controllers\Controller;
 use App\Http\Dto\ListItemsRequestData;
 use App\Http\Filters\InventoryItemFilter;
-use App\Http\Resources\WarehousePaginateResource;
 use App\Http\Resources\WarehouseResource;
-use App\Models\Warehouse;
-use App\Services\WarehouseService;
-use Illuminate\Http\Request;
+use App\Http\Resources\WarehousePaginateResource;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class WarehouseController extends Controller
 {
-
+    use AuthorizesRequests;
     /**
      * @param WarehouseService $warehouseService
      */
@@ -28,12 +29,14 @@ class WarehouseController extends Controller
      */
     public function inventory(Request $request, int $warehouseId)
     {
+        $this->authorize('list', Warehouse::class);
+
         $data = $this->warehouseService->getInventory(
-            $request->get('page', PaginationEnum::PAGE),
-            $request->get('limit', PaginationEnum::LIMIT),
+            $request->get('page', PaginationUtil::PAGE),
+            $request->get('limit', PaginationUtil::LIMIT),
             $warehouseId
         );
-        
+
         return WarehousePaginateResource::collection($data);
     }
 
@@ -47,8 +50,8 @@ class WarehouseController extends Controller
     public function paginate(ListItemsRequestData $listData, InventoryItemFilter $filter)
     {
         $data = $this->warehouseService->paginate(
-            $listData->page ?? PaginationEnum::PAGE,
-            $listData->per_page ?? PaginationEnum::LIMIT,
+            $listData->page ?? PaginationUtil::PAGE,
+            $listData->per_page ?? PaginationUtil::LIMIT,
             $filter
         );
 

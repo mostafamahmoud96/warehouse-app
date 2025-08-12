@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories;
 
+use Carbon\Carbon;
 use App\Models\StockTransfer;
 
 class StockTransferRepository
@@ -30,8 +31,8 @@ class StockTransferRepository
                     'inventory_item_id' => $inventoryItemId,
                 ],
                 [
-                    'quantity' => $quantity['quantity'],
-                    'transfer_date' => now(),
+                    'quantity'      => $quantity['quantity'],
+                    'transfer_date' => Carbon::now()->toDateTimeString(),
                 ]
             );
             $transfers[] = $transfer->toArray();
